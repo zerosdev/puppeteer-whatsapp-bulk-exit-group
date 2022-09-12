@@ -1,0 +1,18 @@
+{
+  "name": "puppeteer-whatsapp-bulk-group-exit",
+  "version": "1.0.0",
+  "description": "Bulk exit and delete WhatsApp groups",
+  "main": "index.js",
+  "author": {
+    "email": "admin@zeros.co.id",
+    "name": "Zeros Technology"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "private": true,
+  "dependencies": {
+    "puppeteer": "^17.1.3"
+  },
+  "devDependencies": {}
+}
