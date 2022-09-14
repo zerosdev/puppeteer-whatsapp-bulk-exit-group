@@ -115,6 +115,7 @@ const title = args.title;
 
                 exit++
                 console.log("Keluar & hapus grup `" + title + "`")
+                await page.waitForTimeout(1000);
             } catch (e) {
                 console.error(e)
                 repeat = false
