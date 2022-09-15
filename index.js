@@ -98,41 +98,41 @@ const title = args.title;
                     return
                 }
 
-                // do {
-                //     try {
-                //         await root.hover()
-                //     } catch (e) {
-                //         if (! /detached/gi.test(e.message)) {
-                //             console.error(e)
-                //         }
-                //         break
-                //     }
-                //     await page.waitForTimeout(500)
-                //     await root.click({
-                //         button: 'right'
-                //     })
-                //     await page.waitForTimeout(500)
-                //     await page.waitForXPath('//li[@data-testid="mi-delete"]')
-                //     let [deleteButton] = await page.$x('//li[@data-testid="mi-delete"]')
-                //     let deleteTitle = await deleteButton.evaluate(el => el.innerText)
-                //     await deleteButton.click()
-                //     await page.waitForTimeout(500)
-                //     await page.waitForXPath('//div[@data-testid="popup-controls-ok"]')
-                //     let [confirm] = await page.$x('//div[@data-testid="popup-controls-ok"]')
-                //     await confirm.click()
-                //     await page.waitForTimeout(500)
+                do {
+                    try {
+                        await root.hover()
+                    } catch (e) {
+                        if (! /detached/gi.test(e.message)) {
+                            console.error(e)
+                        }
+                        break
+                    }
+                    await page.waitForTimeout(500)
+                    await root.click({
+                        button: 'right'
+                    })
+                    await page.waitForTimeout(500)
+                    await page.waitForXPath('//li[@data-testid="mi-delete"]')
+                    let [deleteButton] = await page.$x('//li[@data-testid="mi-delete"]')
+                    let deleteTitle = await deleteButton.evaluate(el => el.innerText)
+                    await deleteButton.click()
+                    await page.waitForTimeout(500)
+                    await page.waitForXPath('//div[@data-testid="popup-controls-ok"]')
+                    let [confirm] = await page.$x('//div[@data-testid="popup-controls-ok"]')
+                    await confirm.click()
+                    await page.waitForTimeout(500)
 
-                //     if ((await page.$x('//div[@data-testid="popup-controls-ok"]')).length > 0) {
-                //         let [confirm2] = await page.$x('//div[@data-testid="popup-controls-ok"]')
-                //         if (confirm2) {
-                //             await confirm2.click()
-                //             await page.waitForTimeout(500)
-                //         }
-                //     }
+                    if ((await page.$x('//div[@data-testid="popup-controls-ok"]')).length > 0) {
+                        let [confirm2] = await page.$x('//div[@data-testid="popup-controls-ok"]')
+                        if (confirm2) {
+                            await confirm2.click()
+                            await page.waitForTimeout(500)
+                        }
+                    }
 
-                //     await page.waitForXPath('//div[@data-testid="popup-controls-ok"]', {hidden: true})
-                //     await page.waitForTimeout(500)
-                // } while ((await chat.$x('.//../../../../../../..')).length > 0)
+                    await page.waitForXPath('//div[@data-testid="popup-controls-ok"]', {hidden: true})
+                    await page.waitForTimeout(500)
+                } while ((await chat.$x('.//../../../../../../..')).length > 0)
 
                 exit++
                 console.log("Keluar & hapus grup `" + groupTitle + "`")
