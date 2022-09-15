@@ -49,8 +49,14 @@ const title = args.title;
 
         await searchColumn.type(title, {delay: 50})
 
-        console.info("Tunggu loading 5 detik...")
-        await page.waitForTimeout(5000)
+        await page.waitForTimeout(500)
+
+        if ((await page.$x('//div[@id="side"]//svg[contains(@class, "gdrnme8s hbnrezoj f8mos8ky tkmeqcnu b9fczbqn")]')).length > 0) {
+            console.info('Menunggu loading selesai...')
+            await page.waitForXPath('//div[@id="side"]//svg[contains(@class, "gdrnme8s hbnrezoj f8mos8ky tkmeqcnu b9fczbqn")]', {hidden: true})
+        }
+
+        await page.waitForTimeout(1000)
 
         let chats = await page.$x('//div[@data-testid="chat-list"]//div[contains(@class, "lhggkp7q ln8gz9je rx9719la")]//div[@data-testid="cell-frame-container"]//span[@data-testid="default-group"]')
         
@@ -66,61 +72,76 @@ const title = args.title;
             break;
         }
 
-        let exit = 0;
+        let exit = 0
 
         await chats.reduce(async (previous, chat) => {
             await previous;
             try {
                 let [root] = await chat.$x('.//../../../../../../..')
+
+                if (root === undefined) {
+                    return
+                }
+
                 await root.evaluate(el => el.scrollIntoView())
                 await page.waitForTimeout(500)
-                let [title] = await root.$x('//span[contains(@class, "ggj6brxn gfz4du6o r7fjleex g0rxnol2 lhj4utae le5p0ye3 l7jjieqr i0jNr")]')
-                title = await title.evaluate(el => el.getAttribute('title'));
+                let [groupTitle] = await root.$x('//span[contains(@class, "ggj6brxn gfz4du6o r7fjleex g0rxnol2 lhj4utae le5p0ye3 l7jjieqr i0jNr")]')
 
-                do {
-                    try {
-                        await root.hover()
-                    } catch (e) {
-                        if (! /detached/gi.test(e.message)) {
-                            console.error(e)
-                        }
-                        break
-                    }
-                    await page.waitForTimeout(500)
-                    await root.click({
-                        button: 'right'
-                    })
-                    await page.waitForTimeout(500)
-                    await page.waitForXPath('//li[@data-testid="mi-delete"]')
-                    let [deleteButton] = await page.$x('//li[@data-testid="mi-delete"]')
-                    let deleteTitle = await deleteButton.evaluate(el => el.innerText)
-                    await deleteButton.click()
-                    await page.waitForTimeout(500)
-                    await page.waitForXPath('//div[@data-testid="popup-controls-ok"]')
-                    let [confirm] = await page.$x('//div[@data-testid="popup-controls-ok"]')
-                    await confirm.click()
-                    await page.waitForTimeout(500)
+                if (groupTitle === undefined) {
+                    return
+                }
 
-                    if ((await page.$x('//div[@data-testid="popup-controls-ok"]')).length > 0) {
-                        let [confirm2] = await page.$x('//div[@data-testid="popup-controls-ok"]')
-                        if (confirm2) {
-                            await confirm2.click()
-                            await page.waitForTimeout(500)
-                        }
-                    }
+                groupTitle = await groupTitle.evaluate(el => el.getAttribute('title'))
 
-                    await page.waitForXPath('//div[@data-testid="popup-controls-ok"]', {hidden: true})
-                    await page.waitForTimeout(500)
-                } while ((await chat.$x('.//../../../../../../..')).length > 0)
+                let re = new RegExp(title, 'gi')
+                if (! re.test(groupTitle)) {
+                    return
+                }
+
+                // do {
+                //     try {
+                //         await root.hover()
+                //     } catch (e) {
+                //         if (! /detached/gi.test(e.message)) {
+                //             console.error(e)
+                //         }
+                //         break
+                //     }
+                //     await page.waitForTimeout(500)
+                //     await root.click({
+                //         button: 'right'
+                //     })
+                //     await page.waitForTimeout(500)
+                //     await page.waitForXPath('//li[@data-testid="mi-delete"]')
+                //     let [deleteButton] = await page.$x('//li[@data-testid="mi-delete"]')
+                //     let deleteTitle = await deleteButton.evaluate(el => el.innerText)
+                //     await deleteButton.click()
+                //     await page.waitForTimeout(500)
+                //     await page.waitForXPath('//div[@data-testid="popup-controls-ok"]')
+                //     let [confirm] = await page.$x('//div[@data-testid="popup-controls-ok"]')
+                //     await confirm.click()
+                //     await page.waitForTimeout(500)
+
+                //     if ((await page.$x('//div[@data-testid="popup-controls-ok"]')).length > 0) {
+                //         let [confirm2] = await page.$x('//div[@data-testid="popup-controls-ok"]')
+                //         if (confirm2) {
+                //             await confirm2.click()
+                //             await page.waitForTimeout(500)
+                //         }
+                //     }
+
+                //     await page.waitForXPath('//div[@data-testid="popup-controls-ok"]', {hidden: true})
+                //     await page.waitForTimeout(500)
+                // } while ((await chat.$x('.//../../../../../../..')).length > 0)
 
                 exit++
-                console.log("Keluar & hapus grup `" + title + "`")
-                await page.waitForTimeout(1000);
+                console.log("Keluar & hapus grup `" + groupTitle + "`")
+                await page.waitForTimeout(1000)
             } catch (e) {
                 console.error(e)
                 repeat = false
             }
-        }, Promise.resolve());
+        }, Promise.resolve())
 
         if (exit > 0) {
             console.log("Berhasil keluar dari " + exit + " grup")
@@ -144,5 +165,5 @@ const title = args.title;
     let [confirm] = await page.$x('//div[@data-testid="popup-controls-ok"]')
     await confirm.click()
     await page.waitForXPath('//div[@data-testid="qrcode"]')
-    await browser.close();
+    await browser.close()
 })();
