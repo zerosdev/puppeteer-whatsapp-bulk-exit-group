@@ -77,8 +77,10 @@ const title = args.title;
 
         await chats.reduce(async (previous, chat) => {
             await previous;
+            let currentIndex = index
+            index++
             try {
-                let [root] = await chat.$x(`.//ancestor::div[@data-testid="list-item-${index}"]`) // [contains(@class, "lhggkp7q ln8gz9je rx9719la")]
+                let [root] = await chat.$x(`.//ancestor::div[@data-testid="list-item-${currentIndex}"]`)
 
                 if (root === undefined) {
                     console.error("`root` undefined. Skip to the next group")
@@ -135,7 +137,7 @@ const title = args.title;
 
                     await page.waitForXPath('//div[@data-testid="popup-controls-ok"]', { hidden: true })
                     await page.waitForTimeout(500)
-                } while ((await chat.$x(`.//ancestor::div[@data-testid="list-item-${index}"]`)).length > 0)
+                } while ((await chat.$x(`.//ancestor::div[@data-testid="list-item-${currentIndex}"]`)).length > 0)
 
                 exit++
                 console.log("Keluar & hapus grup `" + groupTitle + "`")
@@ -144,7 +146,6 @@ const title = args.title;
                 console.error(e)
                 repeat = false
             }
-            index++
         }, Promise.resolve())
 
         if (exit > 0) {
