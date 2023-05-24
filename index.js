@@ -1,22 +1,23 @@
-const puppeteer = require('puppeteer');
-const path = require('path');
-const fs = require('fs');
+const puppeteer = require('puppeteer')
+const path = require('path')
+const fs = require('fs')
 
-var args = [];
+var args = []
 process.argv.slice(2).forEach(function (val, index, array) {
-    let a = val.split('=');
-    args[a[0]] = a[1];
-});
+    let a = val.split('=')
+    args[a[0]] = a[1]
+})
 
 if (!args.hasOwnProperty('title') || args.title.length === 0) {
-    console.error('ERROR: Please specify the `title`');
-    return;
+    console.error('ERROR: Please specify the `title`')
+    return
 }
 
-const title = args.title;
+const title = args.title
+const timeout = args.hasOwnProperty('timeout') && !isNaN(parseInt(args.timeout)) ? parseInt(args.timeout) : 120_000
 
 (async () => {
-    let repeat = true;
+    let repeat = true
     let args = [
         '--disable-gpu',
         '--single-process',
@@ -24,15 +25,15 @@ const title = args.title;
         '--start-maximized',
         '--no-sandbox',
         '--disable-web-security',
-    ];
+    ]
     const browser = await puppeteer.launch({
         headless: false,
         args: args
-    });
+    })
     const [page] = await browser.pages();
-    await page.goto('https://web.whatsapp.com', { waitUntil: ['domcontentloaded', 'networkidle0'] });
-    await page.waitForXPath('//div[@data-testid="qrcode"]', { timeout: 120000 });
-    await page.waitForXPath('//div[@data-testid="chat-list"]', { timeout: 120000 });
+    await page.goto('https://web.whatsapp.com', { waitUntil: ['domcontentloaded', 'networkidle0'] })
+    await page.waitForXPath('//div[@data-testid="qrcode"]', { timeout })
+    await page.waitForXPath('//div[@data-testid="chat-list"]', { timeout })
 
     do {
         console.info("Cari `" + title + "`")
@@ -62,21 +63,21 @@ const title = args.title;
 
         if (!Array.isArray(chats)) {
             console.info("Tidak dapat mengambil chat")
-            repeat = false;
-            break;
+            repeat = false
+            break
         }
 
         if (chats.length === 0) {
             console.info("Chat tidak ditemukan")
-            repeat = false;
-            break;
+            repeat = false
+            break
         }
 
         let exit = 0
         let index = 0
 
         await chats.reduce(async (previous, chat) => {
-            await previous;
+            await previous
             let currentIndex = index
             index++
             try {
@@ -156,7 +157,7 @@ const title = args.title;
             console.log("Mengulangi proses grup lainnya...")
             await page.waitForTimeout(2000)
         }
-    } while (repeat === true);
+    } while (repeat === true)
 
     // logout wa & close browser
     let [menu] = await page.$x('//span[@data-testid="menu"]')
@@ -171,4 +172,4 @@ const title = args.title;
     await confirm.click()
     await page.waitForXPath('//div[@data-testid="qrcode"]')
     await browser.close()
-})();
+})()

@@ -8,4 +8,4 @@ Bulk exit and delete WhatsApp groups
 
 ## Usage
 
-Run ``node index.js title="group title"``
+Run ``npm run start title="group title" timeout=120000``
