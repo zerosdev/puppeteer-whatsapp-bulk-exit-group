@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Bulk exit and delete WhatsApp groups",
   "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
   "author": {
     "email": "admin@zeros.co.id",
     "name": "Zeros Technology"
