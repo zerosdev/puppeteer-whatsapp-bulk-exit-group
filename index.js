@@ -13,8 +13,7 @@ if (!args.hasOwnProperty('title') || args.title.length === 0) {
     return
 }
 
-const title = args.title
-const timeout = args.hasOwnProperty('timeout') && !isNaN(parseInt(args.timeout)) ? parseInt(args.timeout) : 120_000
+const title = args.title;
 
 (async () => {
     let repeat = true
@@ -32,8 +31,8 @@ const timeout = args.hasOwnProperty('timeout') && !isNaN(parseInt(args.timeout))
     })
     const [page] = await browser.pages();
     await page.goto('https://web.whatsapp.com', { waitUntil: ['domcontentloaded', 'networkidle0'] })
-    await page.waitForXPath('//div[@data-testid="qrcode"]', { timeout })
-    await page.waitForXPath('//div[@data-testid="chat-list"]', { timeout })
+    await page.waitForXPath('//div[@data-testid="qrcode"]', { timeout: 120000 })
+    await page.waitForXPath('//div[@data-testid="chat-list"]', { timeout: 120000 })
 
     do {
         console.info("Cari `" + title + "`")
@@ -84,7 +83,6 @@ const timeout = args.hasOwnProperty('timeout') && !isNaN(parseInt(args.timeout))
                 let [root] = await chat.$x(`.//ancestor::div[@data-testid="list-item-${currentIndex}"]`)
 
                 if (root === undefined) {
-                    console.error("`root` undefined. Skip to the next group")
                     return
                 }
 
@@ -123,20 +121,20 @@ const timeout = args.hasOwnProperty('timeout') && !isNaN(parseInt(args.timeout))
                     let [deleteButton] = await page.$x('//li[@data-testid="mi-delete"]')
                     await deleteButton.click()
                     await page.waitForTimeout(500)
-                    await page.waitForXPath('//div[@data-testid="popup-controls-ok"]')
-                    let [confirm] = await page.$x('//div[@data-testid="popup-controls-ok"]')
+                    await page.waitForXPath('//button[@data-testid="popup-controls-ok"]')
+                    let [confirm] = await page.$x('//button[@data-testid="popup-controls-ok"]')
                     await confirm.click()
                     await page.waitForTimeout(500)
 
-                    if ((await page.$x('//div[@data-testid="popup-controls-ok"]')).length > 0) {
-                        let [confirm2] = await page.$x('//div[@data-testid="popup-controls-ok"]')
+                    if ((await page.$x('//button[@data-testid="popup-controls-ok"]')).length > 0) {
+                        let [confirm2] = await page.$x('//button[@data-testid="popup-controls-ok"]')
                         if (confirm2) {
                             await confirm2.click()
                             await page.waitForTimeout(500)
                         }
                     }
 
-                    await page.waitForXPath('//div[@data-testid="popup-controls-ok"]', { hidden: true })
+                    await page.waitForXPath('//button[@data-testid="popup-controls-ok"]', { hidden: true })
                     await page.waitForTimeout(500)
                 } while ((await chat.$x(`.//ancestor::div[@data-testid="list-item-${currentIndex}"]`)).length > 0)
 
@@ -167,8 +165,8 @@ const timeout = args.hasOwnProperty('timeout') && !isNaN(parseInt(args.timeout))
     let [logout] = await page.$x('//li[@data-testid="mi-logout menu-item"]')
     await logout.click()
     await page.waitForTimeout(500)
-    await page.waitForXPath('//div[@data-testid="popup-controls-ok"]')
-    let [confirm] = await page.$x('//div[@data-testid="popup-controls-ok"]')
+    await page.waitForXPath('//button[@data-testid="popup-controls-ok"]')
+    let [confirm] = await page.$x('//button[@data-testid="popup-controls-ok"]')
     await confirm.click()
     await page.waitForXPath('//div[@data-testid="qrcode"]')
     await browser.close()
