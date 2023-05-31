@@ -143,7 +143,7 @@ const title = args.title;
                 await page.waitForTimeout(1000)
             } catch (e) {
                 console.error(e)
-                repeat = false
+                // repeat = false
             }
         }, Promise.resolve())
 
