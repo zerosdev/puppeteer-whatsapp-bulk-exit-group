@@ -30,9 +30,12 @@ const title = args.title;
         args: args
     })
     const [page] = await browser.pages();
-    await page.goto('https://web.whatsapp.com', { waitUntil: ['domcontentloaded', 'networkidle0'] })
+    await page.goto('https://web.whatsapp.com', { waitUntil: ['domcontentloaded', 'networkidle0'], timeout: 60000 })
     await page.waitForXPath('//div[@data-testid="qrcode"]', { timeout: 120000 })
     await page.waitForXPath('//div[@data-testid="chat-list"]', { timeout: 120000 })
+
+    console.info('Jeda sinkronisasi')
+    await page.waitForTimeout(1 * 60000)
 
     do {
         console.info("Cari `" + title + "`")
@@ -40,23 +43,23 @@ const title = args.title;
         let [searchColumn] = await page.$x('//div[@data-testid="chat-list-search"]')
 
         await searchColumn.click()
-        await page.waitForTimeout(500)
+        await page.waitForTimeout(1000)
 
         await page.keyboard.down('ControlLeft')
         await page.keyboard.press('KeyA')
         await page.keyboard.up('ControlLeft')
         await page.keyboard.press('Backspace')
 
-        await searchColumn.type(title, { delay: 50 })
+        await searchColumn.type(title, { delay: 100 })
 
-        await page.waitForTimeout(500)
+        await page.waitForTimeout(1000)
 
         if ((await page.$x('//div[@id="side"]//svg[contains(@class, "gdrnme8s hbnrezoj f8mos8ky tkmeqcnu b9fczbqn")]')).length > 0) {
             console.info('Menunggu loading selesai...')
             await page.waitForXPath('//div[@id="side"]//svg[contains(@class, "gdrnme8s hbnrezoj f8mos8ky tkmeqcnu b9fczbqn")]', { hidden: true })
         }
 
-        await page.waitForTimeout(1000)
+        await page.waitForTimeout(5000)
 
         let chats = await page.$x('//div[@data-testid="chat-list"]//span[@data-testid="default-group"]')
 
@@ -73,14 +76,11 @@ const title = args.title;
         }
 
         let exit = 0
-        let index = 0
 
         await chats.reduce(async (previous, chat) => {
             await previous
-            let currentIndex = index
-            index++
             try {
-                let [root] = await chat.$x(`.//ancestor::div[@data-testid="list-item-${currentIndex}"]`)
+                let [root] = await chat.$x(`.//ancestor::div[contains(@data-testid, "list-item-")]`)
 
                 if (root === undefined) {
                     return
@@ -124,19 +124,19 @@ const title = args.title;
                     await page.waitForXPath('//button[@data-testid="popup-controls-ok"]')
                     let [confirm] = await page.$x('//button[@data-testid="popup-controls-ok"]')
                     await confirm.click()
-                    await page.waitForTimeout(500)
+                    await page.waitForTimeout(1000)
 
                     if ((await page.$x('//button[@data-testid="popup-controls-ok"]')).length > 0) {
                         let [confirm2] = await page.$x('//button[@data-testid="popup-controls-ok"]')
                         if (confirm2) {
                             await confirm2.click()
-                            await page.waitForTimeout(500)
+                            await page.waitForTimeout(1000)
                         }
                     }
 
                     await page.waitForXPath('//button[@data-testid="popup-controls-ok"]', { hidden: true })
-                    await page.waitForTimeout(500)
-                } while ((await chat.$x(`.//ancestor::div[@data-testid="list-item-${currentIndex}"]`)).length > 0)
+                    await page.waitForTimeout(1000)
+                } while ((await chat.$x(`.//ancestor::div[contains(@data-testid, "list-item-")]`)).length > 0)
 
                 exit++
                 console.log("Keluar & hapus grup `" + groupTitle + "`")
